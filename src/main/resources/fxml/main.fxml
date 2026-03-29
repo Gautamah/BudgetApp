@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.Region?>
+
+<BorderPane xmlns="http://javafx.com/javafx/21"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.budget.controller.MainController"
+            stylesheets="@/css/main.css"
+            styleClass="root-pane">
+
+    <!-- En-tete avec informations globales -->
+    <top>
+        <VBox>
+            <VBox styleClass="header">
+                <HBox alignment="CENTER_LEFT" spacing="30" styleClass="header-content">
+                    <padding>
+                        <Insets top="15" right="20" bottom="15" left="20"/>
+                    </padding>
+                    
+                    <!-- Titre de l'application -->
+                    <Label text="💰 Gestionnaire de Budget" styleClass="app-title"/>
+                    
+                    <!-- Espaceur flexible -->
+                    <Region HBox.hgrow="ALWAYS"/>
+                    
+                    <!-- Navigation mensuelle -->
+                    <VBox alignment="CENTER" spacing="2">
+                        <Label text="Mois" styleClass="info-label-small"/>
+                        <HBox alignment="CENTER" spacing="6">
+                            <Button fx:id="moisPrecedentBtn" text="◀" styleClass="nav-arrow-btn"
+                                    onAction="#moisPrecedent"/>
+                            <Label fx:id="moisLabel" text="Janvier 2026" styleClass="info-value-clickable"
+                                   onMouseClicked="#ouvrirSelecteurMois"/>
+                            <Button fx:id="moisSuivantBtn" text="▶" styleClass="nav-arrow-btn"
+                                    onAction="#moisSuivant"/>
+                        </HBox>
+                    </VBox>
+                    
+                    <!-- Recette -->
+                    <VBox alignment="CENTER" spacing="2">
+                        <Label text="Recette" styleClass="info-label-small"/>
+                        <Label fx:id="recetteLabel" text="0.00 €" styleClass="info-value"/>
+                    </VBox>
+                    
+                    <!-- Depenses -->
+                    <VBox alignment="CENTER" spacing="2">
+                        <Label text="Dépenses" styleClass="info-label-small"/>
+                        <Label fx:id="depenseLabel" text="0.00 €" styleClass="info-value"/>
+                    </VBox>
+                    
+                    <!-- Reste -->
+                    <VBox alignment="CENTER" spacing="2">
+                        <Label text="Reste" styleClass="info-label-small"/>
+                        <Label fx:id="resteLabel" text="0.00 €" styleClass="info-value-highlight"/>
+                    </VBox>
+                </HBox>
+            </VBox>
+
+            <!-- Bandeau de mise a jour (cache par defaut) -->
+            <HBox fx:id="updateBanner" alignment="CENTER_LEFT" spacing="10" styleClass="update-banner"
+                  managed="false" visible="false">
+                <padding>
+                    <Insets top="8" right="20" bottom="8" left="20"/>
+                </padding>
+                <Label fx:id="updateLabel" text="Une mise à jour est disponible"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Button text="Mettre à jour" onAction="#ouvrirDialogMiseAJour" styleClass="update-btn"/>
+                <Button text="✕" onAction="#fermerBandeauMaj" styleClass="update-close-btn"/>
+            </HBox>
+        </VBox>
+    </top>
+
+    <!-- Zone de contenu avec onglets -->
+    <center>
+        <TabPane fx:id="tabPane" tabClosingPolicy="UNAVAILABLE" styleClass="main-tab-pane">
+            <!-- Les onglets sont charges dynamiquement par le controleur -->
+        </TabPane>
+    </center>
+
+</BorderPane>
+

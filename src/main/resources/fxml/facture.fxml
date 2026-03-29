@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox xmlns="http://javafx.com/javafx/21"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.budget.controller.FactureController"
+      spacing="15" styleClass="tab-content">
+    <padding>
+        <Insets top="20" right="30" bottom="20" left="30"/>
+    </padding>
+
+    <!-- En-tete -->
+    <HBox alignment="CENTER_LEFT" spacing="20">
+        <Label text="Gestion des Factures" styleClass="section-title"/>
+        <Region HBox.hgrow="ALWAYS"/>
+        <Label text="💡 Double-cliquez pour modifier. Ajoutez via la dernière ligne."
+               styleClass="info-label-small" style="-fx-text-fill: #757575; -fx-font-style: italic;"/>
+        <Region HBox.hgrow="ALWAYS"/>
+        <Label text="Filtrer:" styleClass="form-label"/>
+        <ComboBox fx:id="filtreCategorie" prefWidth="200"/>
+        <Label fx:id="totalLabel" text="Total: 0.00 €" styleClass="info-value"/>
+    </HBox>
+
+    <!-- Tableau des factures (EDITABLE) -->
+    <TableView fx:id="factureTable" VBox.vgrow="ALWAYS" styleClass="data-table" editable="true">
+        <columns>
+            <TableColumn fx:id="actionColumn" text="" prefWidth="35" minWidth="35" maxWidth="35"
+                         editable="false" sortable="false" resizable="false"/>
+            <TableColumn fx:id="typeColumn" text="Type ✏️" prefWidth="180"/>
+            <TableColumn fx:id="fournisseurColumn" text="Fournisseur ✏️" prefWidth="200"/>
+            <TableColumn fx:id="montantColumn" text="Montant ✏️" prefWidth="120"/>
+            <TableColumn fx:id="dateColumn" text="Date ✏️" prefWidth="170" minWidth="160"/>
+            <TableColumn fx:id="categorieColumn" text="Catégorie" prefWidth="160" editable="false"/>
+        </columns>
+    </TableView>
+
+    <!-- Message -->
+    <Label fx:id="messageLabel" text="" styleClass="message-label"/>
+
+</VBox>

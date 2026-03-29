@@ -1,0 +1,516 @@
+/*
+ * Theme Material Design Light pour Budget App
+ * Palette: Bleu primaire, fond clair, accents orange
+ */
+
+/* ==================== VARIABLES ==================== */
+.root {
+    -fx-font-family: "Segoe UI", "Roboto", "Arial", sans-serif;
+    -fx-font-size: 14px;
+    -fx-background-color: #FAFAFA;
+    
+    /* Couleurs principales */
+    -primary-color: #2196F3;
+    -primary-dark: #1976D2;
+    -primary-light: #BBDEFB;
+    -accent-color: #FF9800;
+    -accent-dark: #F57C00;
+    
+    /* Couleurs de fond */
+    -background-color: #FAFAFA;
+    -surface-color: #FFFFFF;
+    -card-color: #FFFFFF;
+    
+    /* Couleurs de texte */
+    -text-primary: #212121;
+    -text-secondary: #757575;
+    -text-hint: #9E9E9E;
+    
+    /* Couleurs d'etat */
+    -error-color: #F44336;
+    -success-color: #4CAF50;
+    -warning-color: #FF9800;
+    
+    /* Bordures et ombres */
+    -border-color: #E0E0E0;
+    -shadow-color: rgba(0, 0, 0, 0.1);
+}
+
+/* ==================== LAYOUT PRINCIPAL ==================== */
+.root-pane {
+    -fx-background-color: -background-color;
+}
+
+/* ==================== EN-TETE ==================== */
+.header {
+    -fx-background-color: -primary-color;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 4, 0, 0, 2);
+}
+
+.header-content {
+    -fx-background-color: transparent;
+}
+
+.app-title {
+    -fx-font-size: 24px;
+    -fx-font-weight: bold;
+    -fx-text-fill: white;
+}
+
+.info-label-small {
+    -fx-font-size: 11px;
+    -fx-text-fill: rgba(255, 255, 255, 0.7);
+    -fx-font-weight: normal;
+}
+
+.info-value {
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-text-fill: white;
+}
+
+.info-value-highlight {
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-text-fill: white;
+}
+
+/* ==================== ONGLETS ==================== */
+.main-tab-pane {
+    -fx-background-color: -background-color;
+}
+
+.main-tab-pane > .tab-header-area {
+    -fx-background-color: -surface-color;
+    -fx-padding: 0;
+}
+
+.main-tab-pane > .tab-header-area > .headers-region > .tab {
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+    -fx-background-radius: 0;
+    -fx-padding: 12 24 12 24;
+}
+
+.main-tab-pane > .tab-header-area > .headers-region > .tab:selected {
+    -fx-background-color: -primary-light;
+}
+
+.main-tab-pane > .tab-header-area > .headers-region > .tab > .tab-container > .tab-label {
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -text-secondary;
+}
+
+.main-tab-pane > .tab-header-area > .headers-region > .tab:selected > .tab-container > .tab-label {
+    -fx-text-fill: -primary-dark;
+}
+
+.main-tab-pane > .tab-content-area {
+    -fx-background-color: -background-color;
+    -fx-padding: 0;
+}
+
+/* ==================== CONTENU DES ONGLETS ==================== */
+.tab-content {
+    -fx-background-color: -background-color;
+}
+
+/* ==================== TITRES ==================== */
+.section-title {
+    -fx-font-size: 24px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -text-primary;
+}
+
+.section-subtitle {
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -text-secondary;
+}
+
+/* ==================== CARTES ==================== */
+.info-card, .form-card, .chart-card {
+    -fx-background-color: -card-color;
+    -fx-padding: 20;
+    -fx-background-radius: 8;
+    -fx-effect: dropshadow(gaussian, -shadow-color, 4, 0, 0, 1);
+}
+
+.card-label {
+    -fx-font-size: 12px;
+    -fx-text-fill: -text-secondary;
+}
+
+.card-title {
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -text-primary;
+}
+
+.big-value {
+    -fx-font-size: 32px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -primary-color;
+}
+
+.edit-pencil {
+    -fx-font-size: 18px;
+    -fx-cursor: hand;
+    -fx-opacity: 0.5;
+}
+
+.edit-pencil:hover {
+    -fx-opacity: 1.0;
+}
+
+/* ==================== FORMULAIRES ==================== */
+.form-label {
+    -fx-font-size: 14px;
+    -fx-text-fill: -text-primary;
+    -fx-font-weight: normal;
+}
+
+.form-label-small {
+    -fx-font-size: 11px;
+    -fx-text-fill: -text-secondary;
+}
+
+.form-input {
+    -fx-background-color: -surface-color;
+    -fx-border-color: -border-color;
+    -fx-border-width: 1;
+    -fx-border-radius: 4;
+    -fx-background-radius: 4;
+    -fx-padding: 8 12;
+    -fx-font-size: 14px;
+}
+
+.form-input:focused {
+    -fx-border-color: -primary-color;
+    -fx-border-width: 2;
+}
+
+/* ==================== BOUTONS ==================== */
+.button-primary {
+    -fx-background-color: -primary-color;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-padding: 10 20;
+    -fx-background-radius: 4;
+    -fx-cursor: hand;
+}
+
+.button-primary:hover {
+    -fx-background-color: -primary-dark;
+}
+
+.button-primary:pressed {
+    -fx-background-color: derive(-primary-dark, -10%);
+}
+
+.button-secondary {
+    -fx-background-color: -surface-color;
+    -fx-text-fill: -primary-color;
+    -fx-font-weight: bold;
+    -fx-padding: 10 20;
+    -fx-background-radius: 4;
+    -fx-border-color: -primary-color;
+    -fx-border-width: 1;
+    -fx-border-radius: 4;
+    -fx-cursor: hand;
+}
+
+.button-secondary:hover {
+    -fx-background-color: -primary-light;
+}
+
+.button-danger {
+    -fx-background-color: -error-color;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-padding: 10 20;
+    -fx-background-radius: 4;
+    -fx-cursor: hand;
+}
+
+.button-danger:hover {
+    -fx-background-color: derive(-error-color, -10%);
+}
+
+/* ==================== TABLEAUX ==================== */
+.data-table {
+    -fx-background-color: -card-color;
+    -fx-border-color: -border-color;
+    -fx-border-width: 1;
+    -fx-border-radius: 4;
+    -fx-background-radius: 4;
+}
+
+.data-table .column-header {
+    -fx-background-color: #F5F5F5;
+    -fx-border-color: -border-color;
+    -fx-border-width: 0 0 1 0;
+}
+
+.data-table .column-header-background {
+    -fx-background-color: #F5F5F5;
+}
+
+.data-table .column-header .label {
+    -fx-font-weight: bold;
+    -fx-text-fill: -text-secondary;
+    -fx-padding: 8;
+}
+
+.data-table .table-row-cell {
+    -fx-background-color: -surface-color;
+    -fx-border-color: transparent transparent -border-color transparent;
+    -fx-border-width: 0 0 1 0;
+}
+
+.data-table .table-row-cell:odd {
+    -fx-background-color: #FAFAFA;
+}
+
+.data-table .table-row-cell:selected {
+    -fx-background-color: -primary-light;
+}
+
+.data-table .table-row-cell:hover {
+    -fx-background-color: #E3F2FD;
+}
+
+.data-table .table-cell {
+    -fx-padding: 8 12;
+    -fx-text-fill: -text-primary;
+}
+
+/* ==================== COMBO BOX ==================== */
+.combo-box {
+    -fx-background-color: -surface-color;
+    -fx-border-color: -border-color;
+    -fx-border-width: 1;
+    -fx-border-radius: 4;
+    -fx-background-radius: 4;
+}
+
+.combo-box:focused {
+    -fx-border-color: -primary-color;
+}
+
+.combo-box .list-cell {
+    -fx-padding: 8 12;
+}
+
+/* ==================== DATE PICKER ==================== */
+.date-picker {
+    -fx-background-color: -surface-color;
+    -fx-border-color: -border-color;
+    -fx-border-width: 1;
+    -fx-border-radius: 4;
+    -fx-background-radius: 4;
+}
+
+.date-picker:focused {
+    -fx-border-color: -primary-color;
+}
+
+/* ==================== CHECK BOX ==================== */
+.check-box {
+    -fx-text-fill: -text-primary;
+}
+
+.check-box .box {
+    -fx-background-color: -surface-color;
+    -fx-border-color: -border-color;
+    -fx-border-width: 2;
+    -fx-border-radius: 2;
+}
+
+.check-box:selected .box {
+    -fx-background-color: -primary-color;
+    -fx-border-color: -primary-color;
+}
+
+.check-box:selected .mark {
+    -fx-background-color: white;
+}
+
+/* ==================== MESSAGES ==================== */
+.message-label {
+    -fx-font-size: 13px;
+    -fx-padding: 5 0;
+}
+
+/* ==================== INFO BOX ==================== */
+.info-box {
+    -fx-background-color: #E3F2FD;
+    -fx-padding: 15;
+    -fx-background-radius: 8;
+}
+
+.info-title {
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -primary-dark;
+}
+
+.info-text {
+    -fx-font-size: 13px;
+    -fx-text-fill: -text-secondary;
+}
+
+/* ==================== RESUME / INDICATEURS ==================== */
+.summary-header {
+    -fx-padding: 10 0;
+}
+
+.summary-card {
+    -fx-background-color: -card-color;
+    -fx-padding: 15 25;
+    -fx-background-radius: 8;
+    -fx-effect: dropshadow(gaussian, -shadow-color, 4, 0, 0, 1);
+}
+
+.summary-label {
+    -fx-font-size: 12px;
+    -fx-text-fill: -text-secondary;
+}
+
+.summary-value {
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -text-primary;
+}
+
+.summary-value-highlight {
+    -fx-font-size: 22px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -success-color;
+}
+
+/* ==================== GRAPHIQUES ==================== */
+.chart {
+    -fx-background-color: transparent;
+}
+
+.chart-plot-background {
+    -fx-background-color: transparent;
+}
+
+.chart-legend {
+    -fx-background-color: transparent;
+}
+
+.chart-title {
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -text-primary;
+}
+
+/* Couleurs du camembert */
+.default-color0.chart-pie { -fx-pie-color: #2196F3; }
+.default-color1.chart-pie { -fx-pie-color: #4CAF50; }
+.default-color2.chart-pie { -fx-pie-color: #FF9800; }
+.default-color3.chart-pie { -fx-pie-color: #9C27B0; }
+.default-color4.chart-pie { -fx-pie-color: #00BCD4; }
+.default-color5.chart-pie { -fx-pie-color: #E91E63; }
+.default-color6.chart-pie { -fx-pie-color: #607D8B; }
+.default-color7.chart-pie { -fx-pie-color: #795548; }
+
+/* Couleurs des barres */
+.default-color0.chart-bar { -fx-bar-fill: #2196F3; }
+.default-color1.chart-bar { -fx-bar-fill: #FF9800; }
+
+/* ==================== NAVIGATION MENSUELLE (en-tete) ==================== */
+.nav-arrow-btn {
+    -fx-background-color: rgba(255, 255, 255, 0.15);
+    -fx-text-fill: white;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-padding: 2 8;
+    -fx-background-radius: 4;
+    -fx-cursor: hand;
+    -fx-min-width: 28;
+    -fx-min-height: 24;
+}
+
+.nav-arrow-btn:hover {
+    -fx-background-color: rgba(255, 255, 255, 0.3);
+}
+
+.nav-arrow-btn:pressed {
+    -fx-background-color: rgba(255, 255, 255, 0.45);
+}
+
+.info-value-clickable {
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-text-fill: white;
+    -fx-cursor: hand;
+    -fx-underline: false;
+}
+
+.info-value-clickable:hover {
+    -fx-underline: true;
+}
+
+/* ==================== BANDEAU MISE A JOUR ==================== */
+.update-banner {
+    -fx-background-color: #E8F5E9;
+    -fx-border-color: #4CAF50;
+    -fx-border-width: 0 0 1 0;
+}
+
+.update-banner .label {
+    -fx-text-fill: #2E7D32;
+    -fx-font-size: 13px;
+}
+
+.update-btn {
+    -fx-background-color: #4CAF50;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-font-size: 12px;
+    -fx-padding: 4 16;
+    -fx-background-radius: 4;
+    -fx-cursor: hand;
+}
+
+.update-btn:hover {
+    -fx-background-color: #388E3C;
+}
+
+.update-close-btn {
+    -fx-background-color: transparent;
+    -fx-text-fill: #757575;
+    -fx-font-size: 14px;
+    -fx-padding: 2 6;
+    -fx-cursor: hand;
+}
+
+.update-close-btn:hover {
+    -fx-text-fill: #212121;
+}
+
+/* ==================== SCROLL PANE ==================== */
+.scroll-pane {
+    -fx-background-color: transparent;
+}
+
+.scroll-pane > .viewport {
+    -fx-background-color: transparent;
+}
+
+/* ==================== TABLE SECTION ==================== */
+.table-section {
+    -fx-background-color: -card-color;
+    -fx-padding: 15;
+    -fx-background-radius: 8;
+    -fx-effect: dropshadow(gaussian, -shadow-color, 4, 0, 0, 1);
+}
+
+
+
+

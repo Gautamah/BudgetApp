@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox xmlns="http://javafx.com/javafx/21"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.budget.controller.BudgetController"
+      spacing="20" styleClass="tab-content">
+    <padding>
+        <Insets top="20" right="30" bottom="20" left="30"/>
+    </padding>
+
+    <!-- Titre et montant non alloue -->
+    <HBox alignment="CENTER_LEFT" spacing="20">
+        <Label text="Gestion des Budgets" styleClass="section-title"/>
+        <Region HBox.hgrow="ALWAYS"/>
+        <Label text="💡 Double-cliquez pour modifier. Ajoutez un budget via la dernière ligne."
+               styleClass="info-label-small" style="-fx-text-fill: #757575; -fx-font-style: italic;"/>
+        <Region HBox.hgrow="ALWAYS"/>
+        <VBox alignment="CENTER_RIGHT">
+            <Label text="Non alloué" styleClass="info-label-small"/>
+            <Label fx:id="nonAlloueLabel" text="0.00 €" styleClass="info-value"/>
+        </VBox>
+    </HBox>
+
+    <!-- Tableau des budgets (EDITABLE) -->
+    <TableView fx:id="budgetTable" VBox.vgrow="ALWAYS" styleClass="data-table" editable="true">
+        <columns>
+            <TableColumn fx:id="actionColumn" text="" prefWidth="35" minWidth="35" maxWidth="35"
+                         editable="false" sortable="false" resizable="false"/>
+            <TableColumn fx:id="categorieColumn" text="Catégorie ✏️" prefWidth="200"/>
+            <TableColumn fx:id="budgetColumn" text="Budget alloué ✏️" prefWidth="200"/>
+            <TableColumn fx:id="depenseColumn" text="Dépensé" prefWidth="120" editable="false"/>
+            <TableColumn fx:id="resteColumn" text="Reste" prefWidth="120" editable="false"/>
+            <TableColumn fx:id="progressColumn" text="Utilisation" prefWidth="100" editable="false"/>
+        </columns>
+    </TableView>
+
+    <!-- Message -->
+    <Label fx:id="messageLabel" text="" styleClass="message-label"/>
+
+</VBox>

@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox xmlns="http://javafx.com/javafx/21"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.budget.controller.TableauDeBordController"
+      spacing="15" styleClass="tab-content">
+    <padding>
+        <Insets top="20" right="25" bottom="20" left="25"/>
+    </padding>
+
+    <!-- Zone principale : recette a gauche, resume a droite -->
+    <HBox spacing="20" VBox.vgrow="ALWAYS">
+
+        <!-- ===== COLONNE GAUCHE (~35%) : Recette + Indicateurs ===== -->
+        <VBox spacing="15" HBox.hgrow="NEVER" prefWidth="340" minWidth="300">
+
+            <!-- Recette actuelle (inline edit) -->
+            <VBox spacing="10" styleClass="info-card">
+                <Label text="Recette mensuelle" styleClass="card-label"/>
+
+                <!-- Mode affichage : valeur + crayon -->
+                <HBox fx:id="recetteDisplayBox" alignment="CENTER_LEFT" spacing="10">
+                    <Label fx:id="recetteActuelleLabel" text="Non définie" styleClass="big-value"/>
+                    <Label text="✏️" styleClass="edit-pencil" onMouseClicked="#editerRecette"/>
+                </HBox>
+
+                <!-- Mode edition (masque par defaut) -->
+                <HBox fx:id="recetteEditBox" alignment="CENTER_LEFT" spacing="8" managed="false" visible="false">
+                    <TextField fx:id="recetteField"
+                               promptText="Ex: 2500.00"
+                               styleClass="form-input"
+                               prefWidth="160"/>
+                    <Button text="✓" onAction="#sauvegarderRecette" styleClass="button-primary"/>
+                    <Button text="✕" onAction="#annulerEditionRecette" styleClass="button-secondary"/>
+                </HBox>
+
+                <Label fx:id="recetteMessageLabel" text="" styleClass="message-label"/>
+            </VBox>
+
+            <!-- Indicateurs empiles -->
+            <VBox spacing="10" styleClass="info-card">
+                <Label text="Synthèse du mois" styleClass="card-title"/>
+
+                <HBox spacing="15">
+                    <VBox alignment="CENTER_LEFT" spacing="2" HBox.hgrow="ALWAYS">
+                        <Label text="Total dépensé" styleClass="summary-label"/>
+                        <Label fx:id="totalDepenseLabel" text="0,00 €" styleClass="summary-value"/>
+                    </VBox>
+                    <VBox alignment="CENTER_LEFT" spacing="2" HBox.hgrow="ALWAYS">
+                        <Label text="Reste global" styleClass="summary-label"/>
+                        <Label fx:id="resteGlobalLabel" text="0,00 €" styleClass="summary-value-highlight"/>
+                    </VBox>
+                </HBox>
+
+                <HBox spacing="15">
+                    <VBox alignment="CENTER_LEFT" spacing="2" HBox.hgrow="ALWAYS">
+                        <Label text="Budgets alloués" styleClass="summary-label"/>
+                        <Label fx:id="totalAlloueLabel" text="0,00 €" styleClass="summary-value"/>
+                    </VBox>
+                    <VBox alignment="CENTER_LEFT" spacing="2" HBox.hgrow="ALWAYS">
+                        <Label text="Non alloué" styleClass="summary-label"/>
+                        <Label fx:id="nonAlloueLabel" text="0,00 €" styleClass="summary-value"/>
+                    </VBox>
+                </HBox>
+            </VBox>
+
+        </VBox>
+
+        <!-- ===== COLONNE DROITE (~65%) : Recap ===== -->
+        <VBox spacing="15" HBox.hgrow="ALWAYS">
+
+            <!-- Tableau recapitulatif -->
+            <VBox spacing="8" styleClass="table-section" VBox.vgrow="ALWAYS">
+                <Label text="Détail par catégorie" styleClass="section-subtitle"/>
+                <TableView fx:id="resumeTable" VBox.vgrow="ALWAYS" styleClass="data-table">
+                    <columns>
+                        <TableColumn fx:id="categorieColumn" text="Catégorie" prefWidth="180"/>
+                        <TableColumn fx:id="budgetColumn" text="Budget" prefWidth="110"/>
+                        <TableColumn fx:id="depenseColumn" text="Dépensé" prefWidth="110"/>
+                        <TableColumn fx:id="resteColumn" text="Reste" prefWidth="110"/>
+                        <TableColumn fx:id="utilisationColumn" text="Utilisation" prefWidth="90"/>
+                    </columns>
+                </TableView>
+            </VBox>
+
+        </VBox>
+
+    </HBox>
+
+    <!-- ===== ZONE INFERIEURE : Historique des mois ===== -->
+    <VBox spacing="8" styleClass="table-section">
+        <Label text="Historique des mois" styleClass="section-subtitle"/>
+        <TableView fx:id="moisTable" prefHeight="150" styleClass="data-table">
+            <columns>
+                <TableColumn fx:id="moisColumn" text="Mois" prefWidth="200"/>
+                <TableColumn fx:id="moisRecetteColumn" text="Recette" prefWidth="150"/>
+                <TableColumn fx:id="moisDepensesColumn" text="Dépenses" prefWidth="150"/>
+                <TableColumn fx:id="moisStatutColumn" text="Statut" prefWidth="100"/>
+            </columns>
+        </TableView>
+    </VBox>
+
+</VBox>
