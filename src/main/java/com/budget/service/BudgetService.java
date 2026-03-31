@@ -314,7 +314,12 @@ public class BudgetService {
             budgetMoisRepository.save(budgetMois);
             log.info("Budget '{}' désactivé (soft-delete, factures liées)", nom);
         } else {
-            budgetMoisRepository.delete(budgetMois);
+            // On retire le budget de la liste du parent AVANT de le supprimer.
+            // C'est necessaire car MoisBudget a cascade=ALL + orphanRemoval=true :
+            // si on supprime le budget directement sans le retirer de la liste du parent,
+            // JPA garde l'ancienne reference en memoire et le budget "reapparait".
+            moisCourant.getBudgets().remove(budgetMois);
+            budgetMoisRepository.flush();
             log.info("Budget '{}' supprimé définitivement", nom);
         }
         return true;
@@ -523,6 +528,7 @@ public class BudgetService {
             facture.getMontant()
         );
         f.setDate(facture.getDateFacture());
+        f.setDocumentPath(facture.getDocumentPath());
         return f;
     }
 
@@ -603,6 +609,39 @@ public class BudgetService {
     public int getNombreFactures() {
         MoisBudget moisCourant = moisBudgetService.getMoisCourant();
         return factureRepository.findByMoisBudget(moisCourant).size();
+    }
+
+    /**
+     * Met a jour le chemin du document associe a une facture.
+     */
+    @Transactional
+    public void mettreAJourDocumentPath(String id, String documentPath) {
+        try {
+            Long factureId = Long.parseLong(id);
+            Optional<Facture> factureOpt = factureRepository.findById(factureId);
+            if (factureOpt.isPresent()) {
+                Facture facture = factureOpt.get();
+                facture.setDocumentPath(documentPath);
+                facture.setDateModification(LocalDateTime.now());
+                factureRepository.save(facture);
+                log.info("Document associe a la facture {} : {}", id, documentPath);
+            }
+        } catch (NumberFormatException e) {
+            log.warn("ID invalide pour mise a jour document : {}", id);
+        }
+    }
+
+    /**
+     * Verifie si une facture similaire existe deja pour le mois courant.
+     */
+    public boolean existeDoublon(String fournisseur, BigDecimal montant, LocalDate date) {
+        MoisBudget moisCourant = moisBudgetService.getMoisCourant();
+        List<Facture> factures = factureRepository.findByMoisBudget(moisCourant);
+        return factures.stream().anyMatch(f ->
+            f.getFournisseur().equalsIgnoreCase(fournisseur)
+            && f.getMontant().compareTo(montant) == 0
+            && f.getDateFacture().equals(date)
+        );
     }
 
     // ==================== VALIDATION ====================

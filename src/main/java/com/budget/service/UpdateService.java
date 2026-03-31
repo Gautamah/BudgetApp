@@ -102,11 +102,38 @@ public class UpdateService {
     /**
      * Telecharge le fichier MSI depuis l'URL donnee.
      * Le callback de progression recoit une valeur entre 0.0 et 1.0.
+     * Gere les redirections HTTP (courantes avec GitHub Releases).
      */
     public void downloadUpdate(String downloadUrl, Path targetPath, Consumer<Double> progressCallback)
             throws IOException {
+        if (downloadUrl == null || downloadUrl.isBlank()) {
+            throw new IOException("URL de téléchargement non configurée");
+        }
+
         HttpURLConnection conn = openConnection(downloadUrl);
         conn.setReadTimeout(60000);
+        conn.setInstanceFollowRedirects(true);
+
+        // GitHub Releases redirige souvent (302) vers un CDN.
+        // HttpURLConnection suit les redirections automatiquement dans le meme protocole,
+        // mais on gere aussi manuellement au cas ou.
+        int responseCode = conn.getResponseCode();
+        int maxRedirects = 5;
+        while ((responseCode == 301 || responseCode == 302 || responseCode == 307)
+                && maxRedirects-- > 0) {
+            String redirectUrl = conn.getHeaderField("Location");
+            if (redirectUrl == null) break;
+            log.debug("Redirection vers : {}", redirectUrl);
+            conn = openConnection(redirectUrl);
+            conn.setReadTimeout(60000);
+            responseCode = conn.getResponseCode();
+        }
+
+        if (responseCode != 200) {
+            throw new IOException("Serveur indisponible (HTTP " + responseCode
+                    + "). La mise à jour n'est peut-être pas encore publiée.");
+        }
+
         long totalSize = conn.getContentLengthLong();
 
         try (InputStream in = conn.getInputStream();

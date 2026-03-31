@@ -15,6 +15,7 @@ public class Facture {
     private String fournisseur;
     private BigDecimal montant;
     private LocalDate date;
+    private String documentPath;
 
     public Facture(TypeFacture type, String fournisseur, BigDecimal montant) {
         this.id = UUID.randomUUID().toString().substring(0, 8);
@@ -78,6 +79,18 @@ public class Facture {
 
     public void setDate(LocalDate date) {
         this.date = date;
+    }
+
+    public String getDocumentPath() {
+        return documentPath;
+    }
+
+    public void setDocumentPath(String documentPath) {
+        this.documentPath = documentPath;
+    }
+
+    public boolean hasDocument() {
+        return documentPath != null && !documentPath.isEmpty();
     }
 
     @Override

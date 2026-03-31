@@ -43,6 +43,11 @@ public class Facture {
     @Column(nullable = false)
     private LocalDateTime dateModification;  // Date/heure de dernière modification
 
+    // Chemin relatif vers le document source (PDF/image) stocke localement.
+    // Peut etre null si la facture a ete saisie manuellement.
+    @Column(length = 500)
+    private String documentPath;
+
     // Constructeurs
     public Facture() {
         this.dateCreation = LocalDateTime.now();
@@ -112,6 +117,18 @@ public class Facture {
 
     public void setDateModification(LocalDateTime dateModification) {
         this.dateModification = dateModification;
+    }
+
+    public String getDocumentPath() {
+        return documentPath;
+    }
+
+    public void setDocumentPath(String documentPath) {
+        this.documentPath = documentPath;
+    }
+
+    public boolean hasDocument() {
+        return documentPath != null && !documentPath.isEmpty();
     }
 
     /**

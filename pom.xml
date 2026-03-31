@@ -67,6 +67,27 @@
             <artifactId>h2</artifactId>
             <scope>runtime</scope>
         </dependency>
+
+        <!-- PDF : lecture et extraction de texte depuis des fichiers PDF -->
+        <dependency>
+            <groupId>org.apache.pdfbox</groupId>
+            <artifactId>pdfbox</artifactId>
+            <version>3.0.4</version>
+        </dependency>
+
+        <!-- OCR : reconnaissance de texte dans les images (via Tesseract) -->
+        <dependency>
+            <groupId>net.sourceforge.tess4j</groupId>
+            <artifactId>tess4j</artifactId>
+            <version>5.13.0</version>
+        </dependency>
+
+        <!-- Tests -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>
@@ -182,6 +203,7 @@
                             <appVersion>${app.version}</appVersion>
                             <vendor>Budget App</vendor>
                             <description>Application de gestion de budget personnel</description>
+                            <destination>${project.build.directory}/jpackage</destination>
                             <input>${project.build.directory}/jpackage-input</input>
                             <mainJar>${project.artifactId}-${project.version}.jar</mainJar>
                             <mainClass>com.budget.BudgetApplication</mainClass>

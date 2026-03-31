@@ -233,7 +233,7 @@ public class MainController implements Initializable {
     private void ouvrirDialogMiseAJour() {
         if (latestUpdate == null) return;
 
-        String notes = latestUpdate.releaseNotes().isBlank()
+        String notes = (latestUpdate.releaseNotes() == null || latestUpdate.releaseNotes().isBlank())
                 ? "Une nouvelle version est disponible."
                 : latestUpdate.releaseNotes();
 
@@ -253,7 +253,14 @@ public class MainController implements Initializable {
     }
 
     private void lancerTelechargement() {
-        String fileName = "Gestionnaire_de_Budget-" + latestUpdate.version() + ".msi";
+        // On extrait le nom du fichier directement depuis l'URL de telechargement.
+        // Ex: "https://.../Gestionnaire.de.Budget-1.0.0.msi" -> "Gestionnaire.de.Budget-1.0.0.msi"
+        // Comme ca, peu importe le format du nom ou la version, ca s'adapte automatiquement.
+        String url = latestUpdate.downloadUrl();
+        String fileName = url.substring(url.lastIndexOf('/') + 1);
+        if (fileName.isBlank()) {
+            fileName = "BudgetApp-" + latestUpdate.version() + ".msi";
+        }
         Path downloadPath = Paths.get(System.getProperty("user.home"), "Downloads", fileName);
 
         Task<Void> downloadTask = new Task<>() {
@@ -284,8 +291,10 @@ public class MainController implements Initializable {
         });
 
         downloadTask.setOnFailed(e -> {
-            log.error("Erreur lors du telechargement", downloadTask.getException());
-            updateLabel.setText("Erreur lors du telechargement");
+            Throwable ex = downloadTask.getException();
+            log.error("Erreur lors du telechargement", ex);
+            String msg = ex.getMessage() != null ? ex.getMessage() : "Erreur inconnue";
+            updateLabel.setText("Erreur : " + msg);
         });
 
         updateLabel.setText("Telechargement en cours...");

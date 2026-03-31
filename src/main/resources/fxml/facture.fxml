@@ -13,8 +13,10 @@
     </padding>
 
     <!-- En-tete -->
-    <HBox alignment="CENTER_LEFT" spacing="20">
+    <HBox alignment="CENTER_LEFT" spacing="15">
         <Label text="Gestion des Factures" styleClass="section-title"/>
+        <Button fx:id="btnImporter" text="📄 Importer (PDF/Image)"
+                styleClass="button-primary" onAction="#importerFacture"/>
         <Region HBox.hgrow="ALWAYS"/>
         <Label text="💡 Double-cliquez pour modifier. Ajoutez via la dernière ligne."
                styleClass="info-label-small" style="-fx-text-fill: #757575; -fx-font-style: italic;"/>
@@ -28,6 +30,8 @@
     <TableView fx:id="factureTable" VBox.vgrow="ALWAYS" styleClass="data-table" editable="true">
         <columns>
             <TableColumn fx:id="actionColumn" text="" prefWidth="35" minWidth="35" maxWidth="35"
+                         editable="false" sortable="false" resizable="false"/>
+            <TableColumn fx:id="documentColumn" text="Doc" prefWidth="40" minWidth="40" maxWidth="40"
                          editable="false" sortable="false" resizable="false"/>
             <TableColumn fx:id="typeColumn" text="Type ✏️" prefWidth="180"/>
             <TableColumn fx:id="fournisseurColumn" text="Fournisseur ✏️" prefWidth="200"/>
