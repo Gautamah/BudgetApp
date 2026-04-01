@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -429,18 +430,14 @@ public class BudgetService {
         }
         validateFournisseurLength(fournisseur);
 
-        MoisBudget moisCourant = moisBudgetService.getMoisCourant();
+        LocalDate date = dateFacture != null ? dateFacture : LocalDate.now();
+        MoisBudget mois = moisBudgetService.getMoisPour(YearMonth.from(date));
         Facture facture = new Facture();
-        facture.setMoisBudget(moisCourant);
+        facture.setMoisBudget(mois);
         facture.setType(type);
         facture.setFournisseur(fournisseur.trim());
         facture.setMontant(montant);
-        
-        if (dateFacture == null) {
-            facture.setDateFacture(LocalDate.now());
-        } else {
-            facture.setDateFacture(dateFacture);
-        }
+        facture.setDateFacture(date);
         
         facture.setDateCreation(LocalDateTime.now());
         facture.setDateModification(LocalDateTime.now());

@@ -103,10 +103,17 @@ public class DocumentService {
     public void ouvrirDocument(String documentPath) {
         try {
             File fichier = getDocument(documentPath);
-            if (fichier.exists() && Desktop.isDesktopSupported()) {
-                Desktop.getDesktop().open(fichier);
+            if (!fichier.exists()) {
+                log.warn("Document introuvable : {}", documentPath);
+                return;
+            }
+            String os = System.getProperty("os.name").toLowerCase();
+            if (os.contains("win")) {
+                new ProcessBuilder("cmd", "/c", "start", "", fichier.getAbsolutePath()).start();
+            } else if (os.contains("mac")) {
+                new ProcessBuilder("open", fichier.getAbsolutePath()).start();
             } else {
-                log.warn("Document introuvable ou Desktop non supporte : {}", documentPath);
+                new ProcessBuilder("xdg-open", fichier.getAbsolutePath()).start();
             }
         } catch (IOException e) {
             log.error("Erreur lors de l'ouverture du document", e);
@@ -119,13 +126,29 @@ public class DocumentService {
     public void imprimerDocument(String documentPath) {
         try {
             File fichier = getDocument(documentPath);
-            if (fichier.exists() && Desktop.isDesktopSupported()) {
-                Desktop.getDesktop().print(fichier);
-            } else {
-                log.warn("Document introuvable ou Desktop non supporte : {}", documentPath);
+            if (!fichier.exists()) {
+                log.warn("Document introuvable : {}", documentPath);
+                return;
             }
-        } catch (IOException e) {
-            log.error("Erreur lors de l'impression du document", e);
+            String os = System.getProperty("os.name").toLowerCase();
+            if (os.contains("win")) {
+                ProcessBuilder pb = new ProcessBuilder("powershell", "-NoProfile", "-Command",
+                        "Start-Process -FilePath '" + fichier.getAbsolutePath() + "' -Verb Print");
+                pb.redirectErrorStream(true);
+                Process p = pb.start();
+                boolean ok = p.waitFor(5, java.util.concurrent.TimeUnit.SECONDS);
+                if (!ok || p.exitValue() != 0) {
+                    log.warn("Verb Print echoue, ouverture du fichier a la place");
+                    ouvrirDocument(documentPath);
+                }
+            } else if (os.contains("mac")) {
+                new ProcessBuilder("lpr", fichier.getAbsolutePath()).start();
+            } else {
+                new ProcessBuilder("lp", fichier.getAbsolutePath()).start();
+            }
+        } catch (Exception e) {
+            log.error("Erreur lors de l'impression, tentative d'ouverture", e);
+            ouvrirDocument(documentPath);
         }
     }
 

@@ -43,9 +43,9 @@
                         </HBox>
                     </VBox>
                     
-                    <!-- Recette -->
+                    <!-- Revenu -->
                     <VBox alignment="CENTER" spacing="2">
-                        <Label text="Recette" styleClass="info-label-small"/>
+                        <Label text="Revenu" styleClass="info-label-small"/>
                         <Label fx:id="recetteLabel" text="0.00 €" styleClass="info-value"/>
                     </VBox>
                     

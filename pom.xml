@@ -13,7 +13,7 @@
 
     <groupId>com.budget</groupId>
     <artifactId>budget-cli</artifactId>
-    <version>1.0.0</version>
+    <version>1.1.0</version>
     <packaging>jar</packaging>
 
     <name>Budget App</name>
@@ -23,7 +23,7 @@
         <java.version>17</java.version>
         <javafx.version>21</javafx.version>
         <javafx-weaver.version>1.3.0</javafx-weaver.version>
-        <app.version>1.0.0</app.version>
+        <app.version>1.1.0</app.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
@@ -80,6 +80,12 @@
             <groupId>net.sourceforge.tess4j</groupId>
             <artifactId>tess4j</artifactId>
             <version>5.13.0</version>
+        </dependency>
+
+        <!-- JSON : lecture du dictionnaire de fournisseurs -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
         </dependency>
 
         <!-- Tests -->

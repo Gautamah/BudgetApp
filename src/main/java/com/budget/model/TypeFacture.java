@@ -17,6 +17,8 @@ public enum TypeFacture {
     EAU("Eau", CategorieBudget.CHARGES_COURANTES),
     GAZ("Gaz", CategorieBudget.CHARGES_COURANTES),
     INTERNET("Internet / Téléphone", CategorieBudget.CHARGES_COURANTES),
+    ABONNEMENT("Abonnements / Streaming", CategorieBudget.CHARGES_COURANTES),
+    LOISIRS("Loisirs / Jeux vidéo", CategorieBudget.CHARGES_COURANTES),
     TRANSPORT("Transport", CategorieBudget.CHARGES_COURANTES),
     SANTE("Santé", CategorieBudget.CHARGES_COURANTES),
 

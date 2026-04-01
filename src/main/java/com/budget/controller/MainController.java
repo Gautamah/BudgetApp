@@ -68,16 +68,20 @@ public class MainController implements Initializable {
 
     private UpdateInfo latestUpdate;
 
+    private final FactureController factureController;
+
     @Autowired
     public MainController(FxWeaver fxWeaver, BudgetService budgetService,
                           MoisBudgetService moisBudgetService, BudgetController budgetController,
-                          TableauDeBordController tableauDeBordController, UpdateService updateService) {
+                          TableauDeBordController tableauDeBordController, UpdateService updateService,
+                          FactureController factureController) {
         this.fxWeaver = fxWeaver;
         this.budgetService = budgetService;
         this.moisBudgetService = moisBudgetService;
         this.budgetController = budgetController;
         this.tableauDeBordController = tableauDeBordController;
         this.updateService = updateService;
+        this.factureController = factureController;
     }
 
     @Override
@@ -110,6 +114,8 @@ public class MainController implements Initializable {
                 tableauDeBordController.actualiserDonnees();
             } else if (newTab == budgetTab) {
                 budgetController.chargerBudgets();
+            } else if (newTab == factureTab) {
+                factureController.rafraichir();
             }
         });
     }
@@ -188,6 +194,7 @@ public class MainController implements Initializable {
         actualiserEnTete();
         tableauDeBordController.actualiserDonnees();
         budgetController.chargerBudgets();
+        factureController.rafraichir();
     }
 
     public void actualiserEnTete() {
@@ -257,10 +264,10 @@ public class MainController implements Initializable {
         // Ex: "https://.../Gestionnaire.de.Budget-1.0.0.msi" -> "Gestionnaire.de.Budget-1.0.0.msi"
         // Comme ca, peu importe le format du nom ou la version, ca s'adapte automatiquement.
         String url = latestUpdate.downloadUrl();
-        String fileName = url.substring(url.lastIndexOf('/') + 1);
-        if (fileName.isBlank()) {
-            fileName = "BudgetApp-" + latestUpdate.version() + ".msi";
-        }
+        String extracted = url.substring(url.lastIndexOf('/') + 1);
+        final String fileName = extracted.isBlank()
+                ? "BudgetApp-" + latestUpdate.version() + ".msi"
+                : extracted;
         Path downloadPath = Paths.get(System.getProperty("user.home"), "Downloads", fileName);
 
         Task<Void> downloadTask = new Task<>() {

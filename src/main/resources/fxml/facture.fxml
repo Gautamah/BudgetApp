@@ -13,16 +13,13 @@
     </padding>
 
     <!-- En-tete -->
-    <HBox alignment="CENTER_LEFT" spacing="15">
-        <Label text="Gestion des Factures" styleClass="section-title"/>
+    <HBox alignment="CENTER_LEFT" spacing="10">
+        <Label text="Factures" styleClass="section-title"/>
         <Button fx:id="btnImporter" text="📄 Importer (PDF/Image)"
                 styleClass="button-primary" onAction="#importerFacture"/>
         <Region HBox.hgrow="ALWAYS"/>
-        <Label text="💡 Double-cliquez pour modifier. Ajoutez via la dernière ligne."
-               styleClass="info-label-small" style="-fx-text-fill: #757575; -fx-font-style: italic;"/>
-        <Region HBox.hgrow="ALWAYS"/>
         <Label text="Filtrer:" styleClass="form-label"/>
-        <ComboBox fx:id="filtreCategorie" prefWidth="200"/>
+        <ComboBox fx:id="filtreCategorie" prefWidth="180" minWidth="120"/>
         <Label fx:id="totalLabel" text="Total: 0.00 €" styleClass="info-value"/>
     </HBox>
 
@@ -33,11 +30,11 @@
                          editable="false" sortable="false" resizable="false"/>
             <TableColumn fx:id="documentColumn" text="Doc" prefWidth="40" minWidth="40" maxWidth="40"
                          editable="false" sortable="false" resizable="false"/>
-            <TableColumn fx:id="typeColumn" text="Type ✏️" prefWidth="180"/>
-            <TableColumn fx:id="fournisseurColumn" text="Fournisseur ✏️" prefWidth="200"/>
-            <TableColumn fx:id="montantColumn" text="Montant ✏️" prefWidth="120"/>
-            <TableColumn fx:id="dateColumn" text="Date ✏️" prefWidth="170" minWidth="160"/>
-            <TableColumn fx:id="categorieColumn" text="Catégorie" prefWidth="160" editable="false"/>
+            <TableColumn fx:id="typeColumn" text="Type ✏️" prefWidth="180" minWidth="140"/>
+            <TableColumn fx:id="fournisseurColumn" text="Fournisseur ✏️" prefWidth="200" minWidth="120"/>
+            <TableColumn fx:id="montantColumn" text="Montant ✏️" prefWidth="100" minWidth="80"/>
+            <TableColumn fx:id="dateColumn" text="Date ✏️" prefWidth="120" minWidth="100"/>
+            <TableColumn fx:id="categorieColumn" text="Catégorie" prefWidth="200" minWidth="180" editable="false"/>
         </columns>
     </TableView>
 

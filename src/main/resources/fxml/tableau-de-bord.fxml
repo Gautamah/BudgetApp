@@ -20,7 +20,7 @@
 
             <!-- Recette actuelle (inline edit) -->
             <VBox spacing="10" styleClass="info-card">
-                <Label text="Recette mensuelle" styleClass="card-label"/>
+                <Label text="Revenu mensuel" styleClass="card-label"/>
 
                 <!-- Mode affichage : valeur + crayon -->
                 <HBox fx:id="recetteDisplayBox" alignment="CENTER_LEFT" spacing="10">
@@ -97,7 +97,7 @@
         <TableView fx:id="moisTable" prefHeight="150" styleClass="data-table">
             <columns>
                 <TableColumn fx:id="moisColumn" text="Mois" prefWidth="200"/>
-                <TableColumn fx:id="moisRecetteColumn" text="Recette" prefWidth="150"/>
+                <TableColumn fx:id="moisRecetteColumn" text="Revenu" prefWidth="150"/>
                 <TableColumn fx:id="moisDepensesColumn" text="Dépenses" prefWidth="150"/>
                 <TableColumn fx:id="moisStatutColumn" text="Statut" prefWidth="100"/>
             </columns>

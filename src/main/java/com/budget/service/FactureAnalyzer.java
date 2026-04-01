@@ -1,5 +1,6 @@
 package com.budget.service;
 
+import java.io.InputStream;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -18,6 +19,8 @@ import org.springframework.stereotype.Service;
 import com.budget.entity.FournisseurMapping;
 import com.budget.model.TypeFacture;
 import com.budget.repository.FournisseurMappingRepository;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * Analyseur de texte de factures.
@@ -42,83 +45,42 @@ public class FactureAnalyzer {
                            BudgetService budgetService) {
         this.mappingRepository = mappingRepository;
         this.budgetService = budgetService;
-        initialiserDictionnaire();
+        chargerDictionnaire();
     }
 
     /**
-     * Remplit le dictionnaire statique avec les fournisseurs francais courants.
-     * C'est le "fallback" utilise quand la table d'apprentissage locale
-     * ne contient pas encore le fournisseur.
+     * Charge le dictionnaire depuis le fichier JSON fournisseurs.json
+     * situe dans les ressources de l'application.
+     * Chaque entree du JSON contient : motCle, fournisseur, type (nom de l'enum TypeFacture).
      */
-    private void initialiserDictionnaire() {
-        // Electricite
-        ajouterAuDictionnaire("edf", "EDF", TypeFacture.ELECTRICITE);
-        ajouterAuDictionnaire("engie", "Engie", TypeFacture.ELECTRICITE);
-        ajouterAuDictionnaire("total energies", "Total Energies", TypeFacture.ELECTRICITE);
-        ajouterAuDictionnaire("totalenergies", "Total Energies", TypeFacture.ELECTRICITE);
-        ajouterAuDictionnaire("direct energie", "Direct Energie", TypeFacture.ELECTRICITE);
+    private void chargerDictionnaire() {
+        try (InputStream is = getClass().getResourceAsStream("/fournisseurs.json")) {
+            if (is == null) {
+                log.error("Fichier fournisseurs.json introuvable dans les ressources");
+                return;
+            }
 
-        // Gaz
-        ajouterAuDictionnaire("grdf", "GRDF", TypeFacture.GAZ);
+            ObjectMapper mapper = new ObjectMapper();
+            List<Map<String, String>> entries = mapper.readValue(
+                    is, new TypeReference<List<Map<String, String>>>() {});
 
-        // Eau
-        ajouterAuDictionnaire("veolia", "Veolia", TypeFacture.EAU);
-        ajouterAuDictionnaire("suez", "Suez", TypeFacture.EAU);
-        ajouterAuDictionnaire("saur", "Saur", TypeFacture.EAU);
-        ajouterAuDictionnaire("eau de paris", "Eau de Paris", TypeFacture.EAU);
+            for (Map<String, String> entry : entries) {
+                String motCle = entry.get("motCle");
+                String fournisseur = entry.get("fournisseur");
+                String typeStr = entry.get("type");
 
-        // Internet / Telephone
-        ajouterAuDictionnaire("sfr", "SFR", TypeFacture.INTERNET);
-        ajouterAuDictionnaire("orange", "Orange", TypeFacture.INTERNET);
-        ajouterAuDictionnaire("free", "Free", TypeFacture.INTERNET);
-        ajouterAuDictionnaire("bouygues", "Bouygues Telecom", TypeFacture.INTERNET);
-        ajouterAuDictionnaire("bouygues telecom", "Bouygues Telecom", TypeFacture.INTERNET);
-        ajouterAuDictionnaire("proximus", "Proximus", TypeFacture.INTERNET);
-        ajouterAuDictionnaire("voo", "VOO", TypeFacture.INTERNET);
-        ajouterAuDictionnaire("telenet", "Telenet", TypeFacture.INTERNET);
+                try {
+                    TypeFacture type = TypeFacture.valueOf(typeStr);
+                    dictionnaireFournisseurs.put(motCle, new FournisseurInfo(fournisseur, type));
+                } catch (IllegalArgumentException e) {
+                    log.warn("Type inconnu '{}' pour le fournisseur '{}', entree ignoree", typeStr, fournisseur);
+                }
+            }
 
-        // Assurance
-        ajouterAuDictionnaire("axa", "AXA", TypeFacture.ASSURANCE);
-        ajouterAuDictionnaire("maif", "MAIF", TypeFacture.ASSURANCE);
-        ajouterAuDictionnaire("matmut", "Matmut", TypeFacture.ASSURANCE);
-        ajouterAuDictionnaire("groupama", "Groupama", TypeFacture.ASSURANCE);
-        ajouterAuDictionnaire("allianz", "Allianz", TypeFacture.ASSURANCE);
-        ajouterAuDictionnaire("macif", "MACIF", TypeFacture.ASSURANCE);
-        ajouterAuDictionnaire("ethias", "Ethias", TypeFacture.ASSURANCE);
-        ajouterAuDictionnaire("ag insurance", "AG Insurance", TypeFacture.ASSURANCE);
-
-        // Transport
-        ajouterAuDictionnaire("sncf", "SNCF", TypeFacture.TRANSPORT);
-        ajouterAuDictionnaire("ratp", "RATP", TypeFacture.TRANSPORT);
-        ajouterAuDictionnaire("navigo", "Navigo", TypeFacture.TRANSPORT);
-        ajouterAuDictionnaire("sncb", "SNCB", TypeFacture.TRANSPORT);
-        ajouterAuDictionnaire("stib", "STIB", TypeFacture.TRANSPORT);
-
-        // Alimentation
-        ajouterAuDictionnaire("carrefour", "Carrefour", TypeFacture.ALIMENTATION);
-        ajouterAuDictionnaire("leclerc", "Leclerc", TypeFacture.ALIMENTATION);
-        ajouterAuDictionnaire("auchan", "Auchan", TypeFacture.ALIMENTATION);
-        ajouterAuDictionnaire("lidl", "Lidl", TypeFacture.ALIMENTATION);
-        ajouterAuDictionnaire("intermarche", "Intermarché", TypeFacture.ALIMENTATION);
-        ajouterAuDictionnaire("colruyt", "Colruyt", TypeFacture.ALIMENTATION);
-        ajouterAuDictionnaire("delhaize", "Delhaize", TypeFacture.ALIMENTATION);
-
-        // Sante
-        ajouterAuDictionnaire("cpam", "CPAM", TypeFacture.SANTE);
-        ajouterAuDictionnaire("ameli", "Ameli", TypeFacture.SANTE);
-        ajouterAuDictionnaire("mutuelle", "Mutuelle", TypeFacture.SANTE);
-
-        // Loyer
-        ajouterAuDictionnaire("loyer", "Loyer", TypeFacture.LOYER);
-
-        // Impots
-        ajouterAuDictionnaire("impots.gouv", "Impôts", TypeFacture.IMPOTS);
-        ajouterAuDictionnaire("dgfip", "Impôts", TypeFacture.IMPOTS);
-        ajouterAuDictionnaire("tresor public", "Trésor Public", TypeFacture.IMPOTS);
-    }
-
-    private void ajouterAuDictionnaire(String motCle, String fournisseur, TypeFacture type) {
-        dictionnaireFournisseurs.put(motCle, new FournisseurInfo(fournisseur, type));
+            log.info("{} fournisseurs charges depuis fournisseurs.json", dictionnaireFournisseurs.size());
+        } catch (Exception e) {
+            log.error("Erreur lors du chargement de fournisseurs.json", e);
+        }
     }
 
     // ==================== ANALYSE PRINCIPALE ====================
@@ -165,12 +127,14 @@ public class FactureAnalyzer {
     private BigDecimal extraireMontant(String texte) {
         // Liste de regex, de la plus specifique a la plus generique
         String[] patternsMonant = {
-            "(?i)Net\\s*[aà]\\s*payer\\s*[:=\\s]*([\\d][\\d\\s]*[,.]\\d{2})",
-            "(?i)Total\\s*TTC\\s*[:=\\s]*([\\d][\\d\\s]*[,.]\\d{2})",
-            "(?i)Montant\\s*TTC\\s*[:=\\s]*([\\d][\\d\\s]*[,.]\\d{2})",
-            "(?i)TOTAL\\s*[AÀ]\\s*PAYER\\s*[:=\\s]*([\\d][\\d\\s]*[,.]\\d{2})",
-            "(?i)Montant\\s*total\\s*[:=\\s]*([\\d][\\d\\s]*[,.]\\d{2})",
-            "(?i)Solde\\s*[aà]\\s*payer\\s*[:=\\s]*([\\d][\\d\\s]*[,.]\\d{2})"
+            "(?i)Net\\s*[aà]\\s*payer\\s*[:=\\s]*(\\d+[,.]\\d{2})",
+            "(?i)Montant\\s*pr[eé]lev[eé].*?(\\d+[,.]\\d{2})",
+            "(?i)Montant\\s*de\\s*la\\s*facture.*?(\\d+[,.]\\d{2})",
+            "(?i)Total\\s*TTC\\s*[:=\\s]*(\\d+[,.]\\d{2})",
+            "(?i)Montant\\s*TTC\\s*[:=\\s]*(\\d+[,.]\\d{2})",
+            "(?i)TOTAL\\s*[AÀ]\\s*PAYER\\s*[:=\\s]*(\\d+[,.]\\d{2})",
+            "(?i)Montant\\s*total\\s*[:=\\s]*(\\d+[,.]\\d{2})",
+            "(?i)Solde\\s*[aà]\\s*payer\\s*[:=\\s]*(\\d+[,.]\\d{2})"
         };
 
         for (String regex : patternsMonant) {
@@ -205,7 +169,7 @@ public class FactureAnalyzer {
      * et retourne le plus grand. Utilise en dernier recours.
      */
     private BigDecimal trouverPlusGrandMontant(String texte) {
-        Pattern pattern = Pattern.compile("(\\d[\\d\\s]*[,.]\\d{2})\\s*(?:€|EUR|euros?)?");
+        Pattern pattern = Pattern.compile("(\\d+[,.]\\d{2})\\s*(?:€|EUR|euros?)?");
         Matcher matcher = pattern.matcher(texte);
         BigDecimal max = null;
 

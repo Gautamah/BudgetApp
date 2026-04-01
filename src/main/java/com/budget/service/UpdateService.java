@@ -51,6 +51,10 @@ public class UpdateService {
             log.warn("Impossible de lire version.properties", e);
             currentVersion = "0.0.0";
         }
+        if (currentVersion.contains("${")) {
+            log.warn("Version non resolue par Maven (mode IDE). Mise a jour desactivee.");
+            currentVersion = "99.99.99";
+        }
         log.info("Version courante : {}", currentVersion);
     }
 

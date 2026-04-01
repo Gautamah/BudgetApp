@@ -71,13 +71,13 @@ public class FactureExtractionService {
                 }
             }
 
-            // Configuration du moteur Tesseract
             tesseract = new Tesseract();
-            // Le datapath doit pointer vers le PARENT du dossier "tessdata"
-            tesseract.setDatapath(tessdataDir.getParent().toString());
+            String datapath = tessdataDir.toAbsolutePath().toString();
+            tesseract.setDatapath(datapath);
             tesseract.setLanguage("fra");
+            tesseract.setOcrEngineMode(1);
 
-            log.info("Tesseract OCR initialise (langue: fra)");
+            log.info("Tesseract OCR initialise (datapath: {}, langue: fra)", datapath);
 
         } catch (IOException e) {
             log.error("Erreur lors de l'initialisation de Tesseract", e);
@@ -166,7 +166,7 @@ public class FactureExtractionService {
      */
     private String faireOCR(BufferedImage image) {
         if (tesseract == null) {
-            log.error("Tesseract non initialise");
+            log.warn("Tesseract non initialise — import manuel requis");
             return "";
         }
         try {
@@ -174,6 +174,9 @@ public class FactureExtractionService {
             return texte != null ? texte.trim() : "";
         } catch (TesseractException e) {
             log.error("Erreur OCR", e);
+            return "";
+        } catch (Error e) {
+            log.error("Erreur native Tesseract (OCR indisponible) : {}", e.getMessage());
             return "";
         }
     }

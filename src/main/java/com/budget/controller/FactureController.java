@@ -7,6 +7,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
+import java.util.Optional;
 import java.util.List;
 import java.util.ResourceBundle;
 
@@ -33,16 +34,13 @@ import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
-import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.DatePicker;
-import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.MenuItem;
@@ -50,12 +48,10 @@ import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
-import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
 import javafx.scene.control.cell.ComboBoxTableCell;
 import javafx.scene.control.cell.TextFieldTableCell;
-import javafx.scene.layout.GridPane;
 import javafx.stage.FileChooser;
 import javafx.util.StringConverter;
 import javafx.util.converter.DefaultStringConverter;
@@ -151,6 +147,7 @@ public class FactureController implements Initializable {
 
     private void configurerTable() {
         factureTable.setEditable(true);
+        factureTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
 
         // Style de la ligne d'ajout (derniere ligne) en italique
         factureTable.setRowFactory(tv -> new TableRow<FactureRow>() {
@@ -743,6 +740,14 @@ public class FactureController implements Initializable {
             if (row.isNewRow() && !row.isTypeDefini()) return new SimpleStringProperty("");
             return new SimpleStringProperty(row.getCategorieLibelle());
         });
+        categorieColumn.setCellFactory(col -> new TableCell<FactureRow, String>() {
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                setText(empty || item == null ? null : item);
+                setTooltip(empty || item == null ? null : new Tooltip(item));
+            }
+        });
         categorieColumn.setEditable(false);
     }
 
@@ -861,8 +866,7 @@ public class FactureController implements Initializable {
             protected void succeeded() {
                 btnImporter.setDisable(false);
                 FactureAnalyzeResult result = getValue();
-                afficherMessage("Analyse terminée", false);
-                afficherDialogPrevisualisation(result, texteExtrait, fichier);
+                importerDirectement(result, fichier);
             }
 
             @Override
@@ -877,173 +881,59 @@ public class FactureController implements Initializable {
     }
 
     /**
-     * Affiche un dialog de previsualisation qui montre les informations extraites
-     * et permet a l'utilisateur de les corriger avant de confirmer.
+     * Cree directement la facture a partir des donnees extraites et l'affiche dans le tableau.
+     * L'utilisateur peut ensuite double-cliquer pour corriger les valeurs.
      */
-    private void afficherDialogPrevisualisation(FactureAnalyzeResult result,
-                                                 String texteExtrait,
-                                                 File fichierOriginal) {
-        Dialog<ButtonType> dialog = new Dialog<>();
-        dialog.setTitle("Import de facture — Prévisualisation");
-        dialog.setHeaderText("Vérifiez et corrigez les informations extraites");
-        dialog.setResizable(true);
-
-        // Boutons du dialog
-        ButtonType confirmerType = new ButtonType("Confirmer", ButtonBar.ButtonData.OK_DONE);
-        ButtonType annulerType = new ButtonType("Annuler", ButtonBar.ButtonData.CANCEL_CLOSE);
-        dialog.getDialogPane().getButtonTypes().addAll(confirmerType, annulerType);
-
-        // Construction du formulaire
-        GridPane grid = new GridPane();
-        grid.setHgap(10);
-        grid.setVgap(10);
-        grid.setPadding(new Insets(20));
-
-        // Champ Type (ComboBox)
-        Label lblType = new Label("Type :");
-        ComboBox<String> comboType = new ComboBox<>(typeLabels);
-        comboType.setPrefWidth(250);
-        if (result.getType() != null) {
-            comboType.setValue(result.getType().getLibelle());
-        }
-
-        // Champ Fournisseur (TextField)
-        Label lblFournisseur = new Label("Fournisseur :");
-        TextField txtFournisseur = new TextField();
-        txtFournisseur.setPrefWidth(250);
-        if (result.getFournisseur() != null) {
-            txtFournisseur.setText(result.getFournisseur());
-        }
-        txtFournisseur.setPromptText("Nom du fournisseur");
-
-        // Champ Montant (TextField)
-        Label lblMontant = new Label("Montant (€) :");
-        TextField txtMontant = new TextField();
-        txtMontant.setPrefWidth(250);
-        if (result.getMontant() != null) {
-            txtMontant.setText(result.getMontant().toPlainString());
-        }
-        txtMontant.setPromptText("ex: 125.50");
-
-        // Champ Date (DatePicker)
-        Label lblDate = new Label("Date :");
-        DatePicker datePicker = new DatePicker();
-        datePicker.setPrefWidth(250);
-        datePicker.setValue(result.getDate() != null ? result.getDate() : LocalDate.now());
-
-        // Zone de texte brut (lecture seule, pour reference)
-        Label lblTexte = new Label("Texte extrait (référence) :");
-        TextArea txtTexte = new TextArea(texteExtrait != null ? texteExtrait : "(aucun texte extrait)");
-        txtTexte.setEditable(false);
-        txtTexte.setPrefRowCount(8);
-        txtTexte.setWrapText(true);
-        txtTexte.setStyle("-fx-font-family: monospace; -fx-font-size: 11px;");
-
-        // Avertissement doublon
-        Label lblDoublon = new Label();
-        lblDoublon.setStyle("-fx-text-fill: #FF9800; -fx-font-weight: bold; -fx-padding: 5 0;");
-        lblDoublon.setWrapText(true);
-        verifierDoublon(result, lblDoublon);
-
-        // Placement dans la grille
-        grid.add(lblType, 0, 0);
-        grid.add(comboType, 1, 0);
-        grid.add(lblFournisseur, 0, 1);
-        grid.add(txtFournisseur, 1, 1);
-        grid.add(lblMontant, 0, 2);
-        grid.add(txtMontant, 1, 2);
-        grid.add(lblDate, 0, 3);
-        grid.add(datePicker, 1, 3);
-        grid.add(lblDoublon, 0, 4, 2, 1);
-        grid.add(lblTexte, 0, 5, 2, 1);
-        grid.add(txtTexte, 0, 6, 2, 1);
-
-        dialog.getDialogPane().setContent(grid);
-        dialog.getDialogPane().setPrefWidth(550);
-
-        // Desactiver le bouton Confirmer tant que les champs obligatoires sont vides
-        Button btnConfirmer = (Button) dialog.getDialogPane().lookupButton(confirmerType);
-        Runnable updateBtnState = () -> {
-            boolean typeOk = comboType.getValue() != null && !comboType.getValue().isEmpty();
-            boolean fournisseurOk = !txtFournisseur.getText().trim().isEmpty();
-            boolean montantOk = estMontantValide(txtMontant.getText());
-            btnConfirmer.setDisable(!(typeOk && fournisseurOk && montantOk));
-        };
-        comboType.valueProperty().addListener((o, a, b) -> updateBtnState.run());
-        txtFournisseur.textProperty().addListener((o, a, b) -> updateBtnState.run());
-        txtMontant.textProperty().addListener((o, a, b) -> updateBtnState.run());
-        updateBtnState.run();
-
-        // Afficher le dialog et traiter la reponse
-        dialog.showAndWait().ifPresent(response -> {
-            if (response == confirmerType) {
-                confirmerImport(comboType, txtFournisseur, txtMontant, datePicker,
-                        result, fichierOriginal);
-            }
-        });
-    }
-
-    /**
-     * Verifie si une facture similaire existe deja et affiche un avertissement.
-     */
-    private void verifierDoublon(FactureAnalyzeResult result, Label lblDoublon) {
-        if (result.getFournisseur() != null && result.getMontant() != null && result.getDate() != null) {
-            if (factureAnalyzer.existeDoublon(result.getFournisseur(), result.getMontant(), result.getDate())) {
-                lblDoublon.setText("⚠ Une facture similaire existe déjà pour ce mois "
-                    + "(même fournisseur, montant et date)");
-            }
-        }
-    }
-
-    /**
-     * Valide et cree la facture apres confirmation dans le dialog.
-     */
-    private void confirmerImport(ComboBox<String> comboType, TextField txtFournisseur,
-                                  TextField txtMontant, DatePicker datePicker,
-                                  FactureAnalyzeResult resultOriginal, File fichierOriginal) {
+    private void importerDirectement(FactureAnalyzeResult result, File fichierOriginal) {
         try {
-            TypeFacture type = findTypeByLibelle(comboType.getValue());
-            String fournisseur = txtFournisseur.getText().trim();
-            BigDecimal montant = new BigDecimal(
-                    txtMontant.getText().replace(",", ".").replace("€", "").trim());
-            LocalDate date = datePicker.getValue();
+            TypeFacture type = result.getType() != null ? result.getType() : TypeFacture.ALIMENTATION;
+            String fournisseur = result.getFournisseur() != null ? result.getFournisseur() : "";
+            BigDecimal montant = result.getMontant() != null && result.getMontant().compareTo(BigDecimal.ZERO) > 0
+                    ? result.getMontant() : BigDecimal.ONE;
+            LocalDate date = result.getDate() != null ? result.getDate() : LocalDate.now();
 
-            if (type == null || fournisseur.isEmpty() || montant.compareTo(BigDecimal.ZERO) <= 0) {
-                afficherMessage("Veuillez remplir tous les champs correctement", true);
-                return;
+            boolean doublon = false;
+            if (result.getFournisseur() != null && result.getMontant() != null) {
+                doublon = factureAnalyzer.existeDoublon(fournisseur, montant, date);
             }
 
-            // 1. Creer la facture en base
+            if (doublon) {
+                Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+                alert.setTitle("Doublon détecté");
+                alert.setHeaderText("Une facture similaire existe déjà");
+                alert.setContentText(fournisseur + " - " + montant + " € - " + date
+                        + "\nVoulez-vous quand même l'importer ?");
+                Optional<ButtonType> rep = alert.showAndWait();
+                if (rep.isEmpty() || rep.get() != ButtonType.OK) return;
+            }
+
             Facture facture = budgetService.ajouterFacture(type, fournisseur, montant, date);
 
-            // 2. Stocker le document et associer le chemin a la facture
             String docPath = documentService.stockerDocument(
                     fichierOriginal, facture.getId(), fournisseur, date);
             if (docPath != null) {
                 budgetService.mettreAJourDocumentPath(facture.getId(), docPath);
             }
 
-            // 3. Apprentissage : si le fournisseur/type ne vient pas du dictionnaire,
-            //    ou si l'utilisateur a corrige les valeurs, on enregistre l'association.
-            boolean fournisseurModifie = resultOriginal.getFournisseur() == null
-                    || !fournisseur.equals(resultOriginal.getFournisseur());
-            boolean typeModifie = resultOriginal.getType() == null
-                    || type != resultOriginal.getType();
-
-            if (fournisseurModifie || typeModifie || !resultOriginal.isDepuisDictionnaire()) {
-                String motCle = fournisseur.toLowerCase().trim();
-                factureAnalyzer.apprendreFournisseur(motCle, fournisseur, type);
+            if (result.getFournisseur() != null) {
+                factureAnalyzer.apprendreFournisseur(
+                        fournisseur.toLowerCase().trim(), fournisseur, type);
             }
 
-            // 4. Rafraichir l'affichage
             chargerFactures();
-            afficherMessage("Facture importée : " + type.getLibelle() + " - " + fournisseur
-                    + " (" + String.format("%.2f €", montant) + ")", false);
+            afficherMessage("Facture importée — Corrigez les champs si nécessaire (double-clic)", false);
 
-        } catch (NumberFormatException e) {
-            afficherMessage("Montant invalide", true);
+            Platform.runLater(() -> {
+                int rowIdx = factureRows.size() - 2;
+                if (rowIdx >= 0) {
+                    factureTable.getSelectionModel().select(rowIdx);
+                    factureTable.scrollTo(rowIdx);
+                    factureTable.edit(rowIdx, typeColumn);
+                }
+            });
+
         } catch (Exception e) {
-            log.error("Erreur lors de l'import de la facture", e);
+            log.error("Erreur lors de l'import", e);
             afficherMessage("Erreur lors de l'import : " + e.getMessage(), true);
         }
     }
@@ -1067,13 +957,27 @@ public class FactureController implements Initializable {
         ContextMenu menu = new ContextMenu();
 
         MenuItem voir = new MenuItem("📄 Voir le document");
-        voir.setOnAction(e -> documentService.ouvrirDocument(row.getDocumentPath()));
+        voir.setOnAction(e -> new Thread(() ->
+                documentService.ouvrirDocument(row.getDocumentPath())).start());
 
         MenuItem enregistrer = new MenuItem("💾 Enregistrer sous...");
         enregistrer.setOnAction(e -> {
             FileChooser fc = new FileChooser();
             fc.setTitle("Enregistrer le document");
-            fc.setInitialFileName(new File(row.getDocumentPath()).getName());
+            String nomFichier = new File(row.getDocumentPath()).getName();
+            fc.setInitialFileName(nomFichier);
+            String ext = nomFichier.contains(".")
+                    ? nomFichier.substring(nomFichier.lastIndexOf('.') + 1).toLowerCase() : "";
+            switch (ext) {
+                case "pdf" -> fc.getExtensionFilters().add(
+                        new FileChooser.ExtensionFilter("PDF", "*.pdf"));
+                case "jpg", "jpeg" -> fc.getExtensionFilters().add(
+                        new FileChooser.ExtensionFilter("Image JPEG", "*.jpg", "*.jpeg"));
+                case "png" -> fc.getExtensionFilters().add(
+                        new FileChooser.ExtensionFilter("Image PNG", "*.png"));
+                default -> fc.getExtensionFilters().add(
+                        new FileChooser.ExtensionFilter("Tous les fichiers", "*.*"));
+            }
             File dest = fc.showSaveDialog(factureTable.getScene().getWindow());
             if (dest != null) {
                 documentService.copierDocument(row.getDocumentPath(), dest);
@@ -1081,10 +985,7 @@ public class FactureController implements Initializable {
             }
         });
 
-        MenuItem imprimer = new MenuItem("🖨 Imprimer");
-        imprimer.setOnAction(e -> documentService.imprimerDocument(row.getDocumentPath()));
-
-        menu.getItems().addAll(voir, enregistrer, imprimer);
+        menu.getItems().addAll(voir, enregistrer);
         menu.show(anchor, javafx.geometry.Side.BOTTOM, 0, 0);
     }
 
@@ -1110,6 +1011,10 @@ public class FactureController implements Initializable {
     }
 
     // ==================== CHARGEMENT DES DONNEES ====================
+
+    public void rafraichir() {
+        chargerFactures();
+    }
 
     private void chargerFactures() {
         factureRows.clear();

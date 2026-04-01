@@ -52,6 +52,15 @@ public class MoisBudgetService {
     }
 
     /**
+     * Recupere ou cree le MoisBudget pour un mois donne, sans changer le mois affiche.
+     */
+    @Transactional
+    public MoisBudget getMoisPour(YearMonth mois) {
+        return moisBudgetRepository.findByMois(mois)
+            .orElseGet(() -> creerNouveauMois(mois));
+    }
+
+    /**
      * Change le mois actif (pour navigation).
      */
     @Transactional
